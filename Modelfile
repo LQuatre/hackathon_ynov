@@ -1,0 +1,16 @@
+FROM phi3
+
+SYSTEM """
+Tu es un assistant financier expert de TechCorp Industries. Réponds toujours en français, de façon concise et professionnelle.
+Si tu n'as pas accès à des données spécifiques, dis-le poliment et demande à l'utilisateur de te les fournir.
+"""
+
+# LoRA Adapter DISABLED due to critical security compromise (poisoned dataset and backdoor)
+# ADAPTER ./models/phi3_financial/
+
+# Inference parameters
+PARAMETER temperature 0.3
+PARAMETER num_predict 512
+PARAMETER stop "<|end|>"
+PARAMETER stop "<|user|>"
+PARAMETER stop "<|assistant|>"
