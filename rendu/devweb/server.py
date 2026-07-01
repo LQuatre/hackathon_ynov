@@ -7,11 +7,16 @@ import json
 PORT = 5000
 OLLAMA_HOST = "localhost"
 OLLAMA_PORT = 11434
+USE_SSL = False
+AUTH_HEADER = ""
 
 class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
     def log_message(self, format, *args):
-        # Silence default logs to keep terminal clean
-        pass
+        sys.stderr.write("%s - - [%s] %s\n" %
+                         (self.address_string(),
+                          self.log_date_time_string(),
+                          format%args))
 
     def do_GET(self):
         if self.path.startswith("/api/"):
@@ -35,17 +40,24 @@ class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             headers['Content-Type'] = self.headers.get('Content-Type', 'application/json')
         
         try:
-            # Connect to Ollama
-            conn = http.client.HTTPConnection(OLLAMA_HOST, OLLAMA_PORT, timeout=10)
+            # Inject authorization header for Cloudflare basic auth
+            headers['Authorization'] = AUTH_HEADER
+            
+            # Connect to Ollama (HTTPS or HTTP)
+            if USE_SSL:
+                conn = http.client.HTTPSConnection(OLLAMA_HOST, OLLAMA_PORT, timeout=30)
+            else:
+                conn = http.client.HTTPConnection(OLLAMA_HOST, OLLAMA_PORT, timeout=30)
+                
             conn.request(method, self.path, body=data, headers=headers)
             response = conn.getresponse()
             
             # Send status code
             self.send_response(response.status)
             
-            # Forward headers (excluding transport headers)
+            # Forward headers (excluding transport headers and standard defaults)
             for key, val in response.getheaders():
-                if key.lower() not in ['content-length', 'transfer-encoding', 'connection']:
+                if key.lower() not in ['content-length', 'transfer-encoding', 'connection', 'date', 'server', 'content-type', 'cache-control']:
                     self.send_header(key, val)
             
             # Force chunked transfer encoding for browser streaming support
@@ -73,6 +85,7 @@ class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             
         except Exception as e:
             # Handle Ollama disconnection or errors gracefully
+            sys.stderr.write(f"Proxy Connection Error: {str(e)}\n")
             try:
                 self.send_response(503)
                 self.send_header('Content-Type', 'application/json')
@@ -84,10 +97,10 @@ class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     # Enable port reuse to avoid 'Address already in use' errors
-    socketserver.TCPServer.allow_reuse_address = True
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
     handler = ProxyHTTPRequestHandler
     
-    with socketserver.TCPServer(("", PORT), handler) as httpd:
+    with socketserver.ThreadingTCPServer(("", PORT), handler) as httpd:
         print(f"\n=======================================================")
         print(f"🚀  Web interface running at: http://localhost:{PORT}")
         print(f"🔌  Proxying API calls to Ollama on {OLLAMA_HOST}:{OLLAMA_PORT}")
