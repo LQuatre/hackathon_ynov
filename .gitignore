@@ -12,3 +12,7 @@ rendu/ia/evaluate_finance_model.py
 
 # Hidden backups
 .backup_cyber_infra/
+
+# Archive files
+*.zip
+
