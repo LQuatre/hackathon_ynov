@@ -3,3 +3,12 @@ datasets/dataset_v0.json
 .venv/
 __pycache__/
 *.pyc
+datasets/medical_dataset_formatted.jsonl
+
+# Rendu duplicate scripts
+rendu/generate_pdfs.py
+rendu/data/prepare_data.py
+rendu/ia/evaluate_finance_model.py
+
+# Hidden backups
+.backup_cyber_infra/

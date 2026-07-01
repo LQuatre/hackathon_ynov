@@ -1,5 +1,13 @@
 # 🤖 PROJET TECHCORP - Challenge IA 7h 🤖
 
+## 👥 ÉQUIPE DE PROJET
+- **DIOT Lucas** (DEV WEB - Frontend & Proxy)
+- **Alquier Antoine** (IA / DATA - Nettoyage & Évaluation)
+- **SALMON Hildrich** (DEV WEB - Frontend & Intégration)
+- **Lavignasse Florent** (CYBER - Audit & Analyse de Backdoor)
+- **Negrello Jack** (CYBER - Audit & Analyse de Backdoor)
+- **ARROUD Rayan** (INFRA - Déploiement Ollama & Modèles)
+
 ## 📋 BRIEFING DE MISSION
 
 **Contexte :** Vous êtes la nouvelle équipe technique de TechCorp Industries. L'équipe précédente a été licenciée suite à des soupçons de compromission du code et des données. Vous devez reprendre leur travail, valider l'intégrité du projet et finaliser le déploiement.
